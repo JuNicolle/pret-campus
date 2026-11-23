@@ -1,4 +1,5 @@
 import type { Availability, Equipment, Loan } from '../types';
+import { isBefore, today } from '../utils/date';
 
 // Disponibilité calculée, jamais stockée : état, puis prêt en cours
 export function getAvailability(eq: Equipment, loans: Loan[]): Availability {
@@ -27,6 +28,25 @@ export function canDeleteEquipment(eq: Equipment, loans: Loan[]): RuleResult {
 export function canSetOutOfService(eq: Equipment, loans: Loan[]): RuleResult {
   if (hasActiveLoan(eq, loans)) {
     return { ok: false, message: 'Enregistrez le retour avant de passer l\'équipement hors service.' };
+  }
+  return { ok: true };
+}
+
+// Prêt autorisé : équipement libre et en état, date de retour non antérieure à aujourd'hui
+export function canLend(
+  eq: Equipment,
+  loans: Loan[],
+  expectedReturnDate: string,
+  now: string = today(),
+): RuleResult {
+  if (hasActiveLoan(eq, loans)) {
+    return { ok: false, message: 'Cet équipement est déjà prêté.' };
+  }
+  if (eq.condition === 'Hors service') {
+    return { ok: false, message: 'Un équipement hors service ne peut pas être prêté.' };
+  }
+  if (isBefore(expectedReturnDate, now)) {
+    return { ok: false, message: 'La date de retour prévue ne peut pas être antérieure à aujourd\'hui.' };
   }
   return { ok: true };
 }
