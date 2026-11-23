@@ -1,7 +1,7 @@
 // Contexte d'authentification locale : un seul profil, aucun mot de passe.
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { clearSession, loadSession, loadUser, saveSession, saveUser } from '../storage/userStorage';
-import type { StorageResult } from '../storage/storageResult';
+import { STORAGE_ERROR_MESSAGE, type StorageResult } from '../storage/storageResult';
 import { validateEmail, validateFirstName, validateLastName } from '../services/validation';
 import { User } from '../types';
 
@@ -34,13 +34,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (cancelled) {
           return;
         }
+        // Chaque lecture est appliquée indépendamment ; premier message d'erreur conservé
+        if (session.ok) {
+          setUser(session.value);
+        }
+        if (stored.ok) {
+          setProfile(stored.value ?? (session.ok ? session.value : null));
+        }
         if (!session.ok) {
           setLoadError(session.message);
         } else if (!stored.ok) {
           setLoadError(stored.message);
-        } else {
-          setUser(session.value);
-          setProfile(stored.value ?? session.value);
+        }
+      } catch {
+        // Exception inattendue : on signale l'erreur sans rejet non géré
+        if (!cancelled) {
+          setLoadError(STORAGE_ERROR_MESSAGE);
         }
       } finally {
         if (!cancelled) {
