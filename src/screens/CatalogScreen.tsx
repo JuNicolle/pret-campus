@@ -1,5 +1,5 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
 import { CatalogHeader } from '../components/CatalogHeader';
 import { EmptyState } from '../components/EmptyState';
@@ -23,15 +23,20 @@ export default function CatalogScreen({ navigation }: Props) {
   const { equipments, loans, isLoading, loadError } = useData();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [logoutError, setLogoutError] = useState<string | null>(null);
+  // Garde synchrone : l'état `disabled` n'agit qu'après le re-rendu.
+  const logoutInProgress = useRef(false);
 
   // En cas de succès, la stack bascule seule : pas de navigate, pas de setState.
   async function handleLogout() {
+    if (logoutInProgress.current) return;
+    logoutInProgress.current = true;
     setLogoutError(null);
     setIsLoggingOut(true);
     const result = await logout();
     if (!result.ok) {
       setLogoutError(result.message);
       setIsLoggingOut(false);
+      logoutInProgress.current = false;
     }
   }
 
@@ -54,7 +59,11 @@ export default function CatalogScreen({ navigation }: Props) {
       </View>
     );
   } else if (loadError) {
-    content = <EmptyState message={loadError} />;
+    content = (
+      <View accessibilityRole="alert">
+        <EmptyState message={loadError} />
+      </View>
+    );
   } else {
     content = (
       <>

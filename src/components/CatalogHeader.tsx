@@ -12,7 +12,7 @@ export function CatalogHeader({ firstName, onLogout, isLoggingOut }: CatalogHead
 
   return (
     <View style={styles.container}>
-      <Text style={styles.greeting} numberOfLines={2}>
+      <Text style={styles.greeting} numberOfLines={2} accessibilityRole="header">
         {greeting}
       </Text>
       <Pressable
