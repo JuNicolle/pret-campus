@@ -21,7 +21,8 @@ export function AppNavigator() {
   // Évite d'afficher l'écran de connexion à un utilisateur déjà connecté.
   if (isLoading) {
     return (
-      <ScreenContainer>
+      // Pas d'en-tête sur cet écran : on protège aussi le haut.
+      <ScreenContainer edges={['top', 'bottom', 'left', 'right']}>
         <ActivityIndicator size="large" />
         <Text style={styles.loading}>Chargement…</Text>
       </ScreenContainer>
