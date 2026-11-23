@@ -8,7 +8,7 @@ export interface EquipmentFilter {
 
 // Minuscules, sans accents ni espaces de bord : "  Écran " devient "ecran".
 export function normalizeText(value: string): string {
-  return value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 }
 
 // Filtre par nom (requête vide = tout) puis, si demandé, par disponibilité.
