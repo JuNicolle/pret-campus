@@ -13,14 +13,17 @@ import { EquipmentForm } from '../components/EquipmentForm';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { useData, type EquipmentInput } from '../context/DataContext';
 import type { AppStackParamList } from '../navigation/types';
+import { equipmentToFormValues } from '../services/equipmentForm';
 
 type Props = NativeStackScreenProps<AppStackParamList, 'EquipmentForm'>;
 
 export default function EquipmentFormScreen({ navigation, route }: Props) {
-  const { addEquipment, isLoading, loadError } = useData();
+  const { equipments, addEquipment, updateEquipment, isLoading, loadError } = useData();
+  const equipmentId = route.params?.equipmentId;
 
   async function handleSubmit(input: EquipmentInput) {
-    const result = await addEquipment(input);
+    const result =
+      equipmentId !== undefined ? await updateEquipment(equipmentId, input) : await addEquipment(input);
     if (result.ok) {
       navigation.goBack();
     }
@@ -41,9 +44,25 @@ export default function EquipmentFormScreen({ navigation, route }: Props) {
         <EmptyState message={loadError} />
       </View>
     );
-  } else if (route.params?.equipmentId !== undefined) {
-    // PC-29 : point d'insertion de la modification (remplace ce message provisoire).
-    content = <EmptyState message="La modification n'est pas encore disponible." />;
+  } else if (equipmentId !== undefined) {
+    const equipment = equipments.find((e) => e.id === equipmentId);
+    content = equipment ? (
+      <>
+        <Text accessibilityRole="header" style={styles.title}>
+          Modifier l'équipement
+        </Text>
+        <EquipmentForm
+          key={equipmentId}
+          initialValues={equipmentToFormValues(equipment)}
+          submitLabel="Enregistrer"
+          onSubmit={handleSubmit}
+        />
+      </>
+    ) : (
+      <View accessibilityRole="alert">
+        <EmptyState message="Cet équipement est introuvable." />
+      </View>
+    );
   } else {
     content = (
       <>
