@@ -1,7 +1,11 @@
 // Contexte des données : équipements et prêts, chargés une fois au démarrage.
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import * as Crypto from 'expo-crypto';
-import { canDeleteEquipment, canSetOutOfService } from '../services/loanRules';
+import {
+  planDeleteEquipment,
+  planUpdateEquipment,
+  type EquipmentInput,
+} from '../services/equipmentWrites';
 import type { LoanInput } from '../services/loanWrites';
 import { saveEquipments } from '../storage/equipmentStorage';
 import { loadInitialData, type InitialData } from '../storage/initialData';
@@ -10,9 +14,7 @@ import { Equipment, Loan } from '../types';
 import { useLoanActions } from './useLoanActions';
 
 export type { LoanInput } from '../services/loanWrites';
-
-// Saisie d'un équipement : id et createdAt sont générés par le contexte
-export type EquipmentInput = Omit<Equipment, 'id' | 'createdAt'>;
+export type { EquipmentInput } from '../services/equipmentWrites';
 
 export interface DataContextValue {
   equipments: Equipment[];
@@ -27,7 +29,6 @@ export interface DataContextValue {
 }
 
 const WRITE_BLOCKED_MESSAGE = 'Les données n\'ont pas été chargées. Relancez l\'application.';
-const NOT_FOUND_MESSAGE = 'Équipement introuvable.';
 
 const DataContext = createContext<DataContextValue | null>(null);
 
@@ -114,21 +115,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
       if (blockedRef.current) {
         return { ok: false, message: WRITE_BLOCKED_MESSAGE };
       }
-      const current = equipmentsRef.current.find((e) => e.id === id);
-      if (!current) {
-        return { ok: false, message: NOT_FOUND_MESSAGE };
-      }
-      // Double sécurité : passage hors service refusé pendant un prêt
-      if (input.condition === 'Hors service' && current.condition !== 'Hors service') {
-        const rule = canSetOutOfService(current, loansRef.current);
-        if (!rule.ok) {
-          return rule;
-        }
-      }
-      // Les champs éditables sont remplacés : une description effacée (clé absente) est retirée
-      const { description: _previous, ...base } = current;
-      const updated: Equipment = { ...base, ...input, id: current.id, createdAt: current.createdAt };
-      return commit(equipmentsRef.current.map((e) => (e.id === id ? updated : e)));
+      const plan = planUpdateEquipment(equipmentsRef.current, loansRef.current, id, input);
+      return plan.ok ? commit(plan.equipments) : plan;
     });
   }, []);
 
@@ -137,16 +125,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
       if (blockedRef.current) {
         return { ok: false, message: WRITE_BLOCKED_MESSAGE };
       }
-      const current = equipmentsRef.current.find((e) => e.id === id);
-      if (!current) {
-        return { ok: false, message: NOT_FOUND_MESSAGE };
-      }
-      // Double sécurité : suppression refusée pendant un prêt
-      const rule = canDeleteEquipment(current, loansRef.current);
-      if (!rule.ok) {
-        return rule;
-      }
-      return commit(equipmentsRef.current.filter((e) => e.id !== id));
+      const plan = planDeleteEquipment(equipmentsRef.current, loansRef.current, id);
+      return plan.ok ? commit(plan.equipments) : plan;
     });
   }, []);
 
