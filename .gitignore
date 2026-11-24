@@ -24,3 +24,6 @@ yarn-error.*
 *.tsbuildinfo
 /ios
 /android
+
+# Couverture de tests
+coverage/
