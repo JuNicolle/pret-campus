@@ -4,9 +4,10 @@ export interface PrimaryButtonProps {
   label: string;
   onPress: () => void;
   disabled?: boolean;
+  accessibilityHint?: string;
 }
 
-export function PrimaryButton({ label, onPress, disabled = false }: PrimaryButtonProps) {
+export function PrimaryButton({ label, onPress, disabled = false, accessibilityHint }: PrimaryButtonProps) {
   return (
     <Pressable
       onPress={onPress}
@@ -14,6 +15,7 @@ export function PrimaryButton({ label, onPress, disabled = false }: PrimaryButto
       disabled={disabled}
       accessibilityRole="button"
       accessibilityLabel={label}
+      accessibilityHint={accessibilityHint}
       accessibilityState={{ disabled }}
       style={[styles.button, disabled && styles.disabled]}
     >
