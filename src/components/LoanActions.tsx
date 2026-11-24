@@ -10,18 +10,20 @@ export interface LoanActionsProps {
   onLend: () => void;
   // Absent : « Enregistrer le retour » reste inactif.
   onReturn?: () => void;
+  // Retour en cours : le bouton est désactivé.
+  isReturning?: boolean;
 }
 
 const noop = () => {};
 
 // Boutons de prêt / retour : simples branches d'affichage, aucune logique métier.
-export function LoanActions({ activeLoan, lendRule, onLend, onReturn }: LoanActionsProps) {
+export function LoanActions({ activeLoan, lendRule, onLend, onReturn, isReturning = false }: LoanActionsProps) {
   if (activeLoan) {
     return (
       <PrimaryButton
         label="Enregistrer le retour"
         onPress={onReturn ?? noop}
-        disabled={onReturn === undefined}
+        disabled={onReturn === undefined || isReturning}
       />
     );
   }
