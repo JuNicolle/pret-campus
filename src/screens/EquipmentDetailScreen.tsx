@@ -12,16 +12,19 @@ import type { AppStackParamList } from '../navigation/types';
 import { canDeleteEquipment, canLend, getActiveLoan, getAvailability } from '../services/loanRules';
 import type { Equipment } from '../types';
 import { today } from '../utils/date';
+import { useReturnLoan } from './useReturnLoan';
 
 type Props = NativeStackScreenProps<AppStackParamList, 'EquipmentDetail'>;
 
 export default function EquipmentDetailScreen({ navigation, route }: Props) {
   const { equipments, loans, isLoading, loadError, deleteEquipment } = useData();
-  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   // Garde synchrone : couvre aussi l'ouverture de l'Alert (double appui).
   const deleteInProgress = useRef(false);
   const equipment = equipments.find((e) => e.id === route.params.equipmentId);
+  const activeLoan = equipment ? getActiveLoan(equipment.id, loans) : undefined;
+  const { handleReturn, isReturning } = useReturnLoan(activeLoan, setActionError);
 
   function release() {
     deleteInProgress.current = false;
@@ -31,7 +34,7 @@ export default function EquipmentDetailScreen({ navigation, route }: Props) {
     setIsDeleting(true);
     const result = await deleteEquipment(id);
     if (!result.ok) {
-      setDeleteError(result.message);
+      setActionError(result.message);
       setIsDeleting(false);
       release();
       return;
@@ -43,11 +46,11 @@ export default function EquipmentDetailScreen({ navigation, route }: Props) {
   function handleDelete(target: Equipment) {
     if (deleteInProgress.current) return;
     deleteInProgress.current = true;
-    setDeleteError(null);
+    setActionError(null);
     // Règle vérifiée en amont ; le contexte la revérifie à la suppression.
     const rule = canDeleteEquipment(target, loans);
     if (!rule.ok) {
-      setDeleteError(rule.message);
+      setActionError(rule.message);
       release();
       return;
     }
@@ -91,15 +94,14 @@ export default function EquipmentDetailScreen({ navigation, route }: Props) {
     );
   } else {
     const availability = getAvailability(equipment, loans);
-    const activeLoan = getActiveLoan(equipment.id, loans);
     const lendRule = canLend(equipment, loans, today());
     content = (
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <EquipmentSummary equipment={equipment} availability={availability} />
         {activeLoan ? <LoanInfo loan={activeLoan} /> : null}
-        {deleteError ? (
+        {actionError ? (
           <Text style={styles.error} accessibilityRole="alert">
-            {deleteError}
+            {actionError}
           </Text>
         ) : null}
         <View style={styles.actions}>
@@ -107,6 +109,8 @@ export default function EquipmentDetailScreen({ navigation, route }: Props) {
             activeLoan={activeLoan}
             lendRule={lendRule}
             onLend={() => navigation.navigate('LoanForm', { equipmentId: equipment.id })}
+            onReturn={() => void handleReturn()}
+            isReturning={isReturning}
           />
           <PrimaryButton
             label="Modifier"
