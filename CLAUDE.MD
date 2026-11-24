@@ -15,6 +15,7 @@ Examen de rattrapage ForEach Académy — **travail individuel, 4 jours**, soute
   → Ne jamais proposer d'optionnelle tant qu'une obligatoire n'est pas terminée et testée.
 - Pas de backend, pas d'API externe, pas de mot de passe. Ne pas en ajouter.
 - Pas de dépendance superflue : chaque lib ajoutée doit être justifiable à l'oral.
+  → Exception actée (ticket PC-41) : Jest (`jest`, `jest-expo`) en `devDependencies`, pour les tests unitaires des fonctions pures. Pas d'autre runner de test, ni de lib de test d'interface.
 
 ---
 
@@ -30,13 +31,18 @@ Examen de rattrapage ForEach Académy — **travail individuel, 4 jours**, soute
 | Dates | Objets `Date` natifs + chaînes ISO `YYYY-MM-DD` (pas de lib de dates) |
 | Sélecteur de date | `@react-native-community/datetimepicker` |
 | État global | React Context (`AuthContext`, `DataContext`) — pas de Redux |
+| Tests unitaires | Jest via `jest-expo` (`devDependencies`) |
 
 Commandes :
 ```bash
 npm install
 npx expo start          # puis a (Android) / i (iOS) / scan QR avec Expo Go
 npx tsc --noEmit        # vérification des types
+npm test                # tests unitaires (Jest)
+npm run test:coverage   # couverture, seuil global 80 %
 ```
+
+Après un `git pull` qui ajoute des dépendances, relancer `npm install`.
 
 ---
 
@@ -60,11 +66,17 @@ src/
 │   └── loanStorage.ts
 ├── services/       # Règles de gestion pures (testables, sans UI ni stockage)
 │   ├── loanRules.ts
-│   └── validation.ts
+│   ├── validation.ts
+│   └── __tests__/  # Tests unitaires, à côté du code testé
 ├── data/seed.ts    # ≥ 6 équipements de démo, ≥ 3 catégories
 ├── types/index.ts
-└── utils/date.ts   # today(), isBefore(), formatFr()
+├── utils/
+│   ├── date.ts     # today(), isBefore(), formatFr()
+│   └── __tests__/  # Tests unitaires de utils/
+└── __tests__/fixtures.ts  # Fabriques de données de test partagées
 ```
+
+À la racine : `jest.config.js` (configuration de Jest, périmètre de couverture, seuil de 80 %).
 
 Règles :
 - Les écrans n'appellent **jamais** AsyncStorage directement : ils passent par le Context, qui appelle `storage/`.
@@ -185,6 +197,8 @@ Avant de déclarer une fonctionnalité terminée, vérifier le scénario corresp
 7. Recherche par nom + filtre « disponibles », y compris cas « aucun résultat ».
 
 Ajouter aussi : date de retour passée refusée ; passage hors service bloqué pendant un prêt ; champs obligatoires vides.
+
+Les règles pures du §5 sont couvertes par des tests automatisés (messages exacts et cas limites) ; les scénarios d'interface restent à vérifier manuellement.
 
 ---
 
