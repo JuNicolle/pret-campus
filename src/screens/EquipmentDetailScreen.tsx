@@ -1,21 +1,62 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { EmptyState } from '../components/EmptyState';
 import { EquipmentSummary } from '../components/EquipmentSummary';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { useData } from '../context/DataContext';
 import type { AppStackParamList } from '../navigation/types';
-import { getAvailability } from '../services/loanRules';
+import { canDeleteEquipment, getAvailability } from '../services/loanRules';
+import type { Equipment } from '../types';
 
 type Props = NativeStackScreenProps<AppStackParamList, 'EquipmentDetail'>;
 
 export default function EquipmentDetailScreen({ navigation, route }: Props) {
-  const { equipments, loans, isLoading, loadError } = useData();
+  const { equipments, loans, isLoading, loadError, deleteEquipment } = useData();
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  // Garde synchrone : couvre aussi l'ouverture de l'Alert (double appui).
+  const deleteInProgress = useRef(false);
   const equipment = equipments.find((e) => e.id === route.params.equipmentId);
 
-  function handleDelete() {
-    // Câblé par PC-31 (bouton inactif d'ici là).
+  function release() {
+    deleteInProgress.current = false;
+  }
+
+  async function confirmDelete(id: string) {
+    setIsDeleting(true);
+    const result = await deleteEquipment(id);
+    if (!result.ok) {
+      setDeleteError(result.message);
+      setIsDeleting(false);
+      release();
+      return;
+    }
+    // Succès : l'écran est retiré, la garde reste levée.
+    navigation.goBack();
+  }
+
+  function handleDelete(target: Equipment) {
+    if (deleteInProgress.current) return;
+    deleteInProgress.current = true;
+    setDeleteError(null);
+    // Règle vérifiée en amont ; le contexte la revérifie à la suppression.
+    const rule = canDeleteEquipment(target, loans);
+    if (!rule.ok) {
+      setDeleteError(rule.message);
+      release();
+      return;
+    }
+    Alert.alert(
+      `Supprimer « ${target.name} » ? Cette action est définitive.`,
+      undefined,
+      [
+        { text: 'Annuler', style: 'cancel', onPress: release },
+        { text: 'Supprimer', style: 'destructive', onPress: () => void confirmDelete(target.id) },
+      ],
+      { cancelable: true, onDismiss: release },
+    );
   }
 
   let content;
@@ -32,6 +73,13 @@ export default function EquipmentDetailScreen({ navigation, route }: Props) {
         <EmptyState message={loadError} />
       </View>
     );
+  } else if (equipment === undefined && isDeleting) {
+    // Suppression réussie : pas de « introuvable » avant le retour.
+    content = (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   } else if (equipment === undefined) {
     content = (
       <View accessibilityRole="alert">
@@ -43,12 +91,21 @@ export default function EquipmentDetailScreen({ navigation, route }: Props) {
     content = (
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <EquipmentSummary equipment={equipment} availability={availability} />
+        {deleteError ? (
+          <Text style={styles.error} accessibilityRole="alert">
+            {deleteError}
+          </Text>
+        ) : null}
         <View style={styles.actions}>
           <PrimaryButton
             label="Modifier"
             onPress={() => navigation.navigate('EquipmentForm', { equipmentId: equipment.id })}
           />
-          <PrimaryButton label="Supprimer" onPress={handleDelete} disabled />
+          <PrimaryButton
+            label="Supprimer"
+            onPress={() => handleDelete(equipment)}
+            disabled={isDeleting}
+          />
         </View>
       </ScrollView>
     );
@@ -69,6 +126,11 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+  },
+  error: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#B91C1C',
   },
   actions: {
     gap: 12,
