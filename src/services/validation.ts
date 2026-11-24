@@ -1,4 +1,5 @@
 // Validation des champs de formulaire : fonctions pures, sans UI ni stockage.
+import type { Category } from '../types';
 
 export type ValidationResult = { ok: true } | { ok: false; message: string };
 
@@ -27,6 +28,18 @@ export function validateEmail(value: string): ValidationResult {
   }
   if (!EMAIL_REGEX.test(email)) {
     return { ok: false, message: 'Email invalide.' };
+  }
+  return { ok: true };
+}
+
+// Règles propres à l'équipement (indépendantes de validateLastName, nom de personne).
+export function validateEquipmentName(value: string): ValidationResult {
+  return validateRequired(value, 'Le nom est obligatoire.');
+}
+
+export function validateEquipmentCategory(value: Category | null): ValidationResult {
+  if (value === null) {
+    return { ok: false, message: 'La catégorie est obligatoire.' };
   }
   return { ok: true };
 }
