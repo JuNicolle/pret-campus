@@ -11,9 +11,14 @@ export function getAvailability(eq: Equipment, loans: Loan[]): Availability {
 // Résultat d'une règle de gestion : autorisé, ou refusé avec un message pour l'écran
 export type RuleResult = { ok: true } | { ok: false; message: string };
 
+// Prêt en cours d'un équipement (non rendu), s'il existe
+export function getActiveLoan(equipmentId: string, loans: Loan[]): Loan | undefined {
+  return loans.find((l) => l.equipmentId === equipmentId && !l.returnedAt);
+}
+
 // Vrai si l'équipement a un prêt non rendu
 function hasActiveLoan(eq: Equipment, loans: Loan[]): boolean {
-  return loans.some((l) => l.equipmentId === eq.id && !l.returnedAt);
+  return getActiveLoan(eq.id, loans) !== undefined;
 }
 
 // Suppression interdite tant qu'un prêt est en cours

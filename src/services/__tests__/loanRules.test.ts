@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
 import { makeEquipment, makeLoan } from '../../__tests__/fixtures';
-import { canDeleteEquipment, canLend, canSetOutOfService, getAvailability } from '../loanRules';
+import { canDeleteEquipment, canLend, canSetOutOfService, getActiveLoan, getAvailability } from '../loanRules';
 
 afterEach(() => {
   jest.useRealTimers();
@@ -33,6 +33,35 @@ describe('getAvailability', () => {
 
   it('should prefer Indisponible over an active loan', () => {
     expect(getAvailability(makeEquipment({ condition: 'Hors service' }), [makeLoan()])).toBe('Indisponible');
+  });
+});
+
+describe('getActiveLoan', () => {
+  it('should return the active loan', () => {
+    const loan = makeLoan();
+    expect(getActiveLoan('eq-1', [loan])).toBe(loan);
+  });
+
+  it('should return undefined without loan', () => {
+    expect(getActiveLoan('eq-1', [])).toBeUndefined();
+  });
+
+  it('should return undefined when every loan is returned', () => {
+    expect(getActiveLoan('eq-1', [makeLoan({ returnedAt: '2026-11-05' })])).toBeUndefined();
+  });
+
+  it('should ignore the active loan of another equipment', () => {
+    expect(getActiveLoan('eq-1', [makeLoan({ equipmentId: 'eq-2' })])).toBeUndefined();
+  });
+
+  it('should find the active loan among returned loans of the history', () => {
+    const active = makeLoan({ id: 'loan-3' });
+    const loans = [
+      makeLoan({ id: 'loan-1', returnedAt: '2026-10-05' }),
+      makeLoan({ id: 'loan-2', returnedAt: '2026-10-20' }),
+      active,
+    ];
+    expect(getActiveLoan('eq-1', loans)).toBe(active);
   });
 });
 

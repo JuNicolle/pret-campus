@@ -3,12 +3,15 @@ import { useRef, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { EmptyState } from '../components/EmptyState';
 import { EquipmentSummary } from '../components/EquipmentSummary';
+import { LoanActions } from '../components/LoanActions';
+import { LoanInfo } from '../components/LoanInfo';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { useData } from '../context/DataContext';
 import type { AppStackParamList } from '../navigation/types';
-import { canDeleteEquipment, getAvailability } from '../services/loanRules';
+import { canDeleteEquipment, canLend, getActiveLoan, getAvailability } from '../services/loanRules';
 import type { Equipment } from '../types';
+import { today } from '../utils/date';
 
 type Props = NativeStackScreenProps<AppStackParamList, 'EquipmentDetail'>;
 
@@ -88,15 +91,23 @@ export default function EquipmentDetailScreen({ navigation, route }: Props) {
     );
   } else {
     const availability = getAvailability(equipment, loans);
+    const activeLoan = getActiveLoan(equipment.id, loans);
+    const lendRule = canLend(equipment, loans, today());
     content = (
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <EquipmentSummary equipment={equipment} availability={availability} />
+        {activeLoan ? <LoanInfo loan={activeLoan} /> : null}
         {deleteError ? (
           <Text style={styles.error} accessibilityRole="alert">
             {deleteError}
           </Text>
         ) : null}
         <View style={styles.actions}>
+          <LoanActions
+            activeLoan={activeLoan}
+            lendRule={lendRule}
+            onLend={() => navigation.navigate('LoanForm', { equipmentId: equipment.id })}
+          />
           <PrimaryButton
             label="Modifier"
             onPress={() => navigation.navigate('EquipmentForm', { equipmentId: equipment.id })}
