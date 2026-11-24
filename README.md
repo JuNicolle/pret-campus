@@ -11,6 +11,7 @@ Projet d'examen de rattrapage ForEach Académy, réalisé en 4 jours.
 npm install
 npx expo start      # puis a (Android), i (iOS) ou scan du QR code avec Expo Go
 npx tsc --noEmit    # vérification des types
+npm test            # tests unitaires (Jest)
 ```
 
 ## Fonctionnalités
@@ -37,7 +38,7 @@ Cette collaboration est assumée et visible dans l'historique Git.
 | `react-native-expo-expert` | Initialisation Expo, navigation, stockage AsyncStorage, modules Expo |
 | `react-native-component-architect` | Écrans, composants réutilisables, formulaires, hooks |
 | `ui-designer` | Lisibilité mobile, badges, zones tactiles, cohérence visuelle |
-| `quality-analyst` | Tests des règles de gestion, fiche de tests |
+| `quality-analyst` | Tests des règles de gestion (Jest), fiche de tests |
 | `code-reviewer` | Revue avant livraison |
 
 ### Déroulement
