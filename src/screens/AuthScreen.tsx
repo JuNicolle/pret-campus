@@ -1,5 +1,5 @@
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text } from 'react-native';
-import { EmptyState } from '../components/EmptyState';
+import { LoginPrompt } from '../components/LoginPrompt';
 import { RegisterForm } from '../components/RegisterForm';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { useAuth } from '../context/AuthContext';
@@ -8,12 +8,8 @@ export default function AuthScreen() {
   const { profile, loadError } = useAuth();
 
   // Corps choisi en une seule branche (profil unique, CLAUDE.md §6).
-  const body =
-    profile === null ? (
-      <RegisterForm />
-    ) : (
-      <EmptyState message="Un profil existe déjà sur cet appareil." />
-    );
+  const body = profile === null ? <RegisterForm /> : <LoginPrompt profile={profile} />;
+  const title = profile === null ? 'Créer votre profil' : 'Content de vous revoir';
 
   return (
     <ScreenContainer>
@@ -23,7 +19,7 @@ export default function AuthScreen() {
       >
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
           <Text accessibilityRole="header" style={styles.title}>
-            Créer votre profil
+            {title}
           </Text>
           {loadError !== null && (
             <Text accessibilityRole="alert" style={styles.banner}>
