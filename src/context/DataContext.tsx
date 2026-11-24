@@ -2,10 +2,14 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import * as Crypto from 'expo-crypto';
 import { canDeleteEquipment, canSetOutOfService } from '../services/loanRules';
+import type { LoanInput } from '../services/loanWrites';
 import { saveEquipments } from '../storage/equipmentStorage';
 import { loadInitialData, type InitialData } from '../storage/initialData';
 import type { StorageResult } from '../storage/storageResult';
 import { Equipment, Loan } from '../types';
+import { useLoanActions } from './useLoanActions';
+
+export type { LoanInput } from '../services/loanWrites';
 
 // Saisie d'un équipement : id et createdAt sont générés par le contexte
 export type EquipmentInput = Omit<Equipment, 'id' | 'createdAt'>;
@@ -18,6 +22,8 @@ export interface DataContextValue {
   addEquipment: (input: EquipmentInput) => Promise<StorageResult>;
   updateEquipment: (id: string, input: EquipmentInput) => Promise<StorageResult>;
   deleteEquipment: (id: string) => Promise<StorageResult>;
+  addLoan: (input: LoanInput) => Promise<StorageResult>;
+  returnLoan: (loanId: string) => Promise<StorageResult>;
 }
 
 const WRITE_BLOCKED_MESSAGE = 'Les données n\'ont pas été chargées. Relancez l\'application.';
@@ -68,6 +74,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
     queueRef.current = run.catch(() => undefined);
     return run;
   }
+
+  // Écriture en file, refusée tant que le chargement n'est pas terminé sans erreur
+  const write = useCallback(
+    (task: () => Promise<StorageResult>): Promise<StorageResult> =>
+      enqueue(async () => (blockedRef.current ? { ok: false, message: WRITE_BLOCKED_MESSAGE } : task())),
+    [],
+  );
+
+  const { addLoan, returnLoan } = useLoanActions({ equipmentsRef, loansRef, write, setLoans });
 
   // Sauvegarde d'abord ; état et ref ne changent qu'en cas de succès
   async function commit(next: Equipment[]): Promise<StorageResult> {
@@ -142,8 +157,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
       addEquipment,
       updateEquipment,
       deleteEquipment,
+      addLoan,
+      returnLoan,
     }),
-    [equipments, loans, isLoading, loadError, addEquipment, updateEquipment, deleteEquipment],
+    [equipments, loans, isLoading, loadError, addEquipment, updateEquipment, deleteEquipment, addLoan, returnLoan],
   );
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
