@@ -6,11 +6,13 @@ import { EmptyState } from '../components/EmptyState';
 import { EquipmentCard } from '../components/EquipmentCard';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ScreenContainer } from '../components/ScreenContainer';
+import { SearchBar } from '../components/SearchBar';
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import type { AppStackParamList } from '../navigation/types';
 import { getAvailability } from '../services/loanRules';
 import type { Equipment } from '../types';
+import { filterEquipments } from '../utils/search';
 
 type Props = NativeStackScreenProps<AppStackParamList, 'Catalog'>;
 
@@ -23,8 +25,11 @@ export default function CatalogScreen({ navigation }: Props) {
   const { equipments, loans, isLoading, loadError } = useData();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [logoutError, setLogoutError] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
   // Garde synchrone : l'état `disabled` n'agit qu'après le re-rendu.
   const logoutInProgress = useRef(false);
+
+  const visibleEquipments = filterEquipments(equipments, loans, { query, onlyAvailable: false });
 
   // En cas de succès, la stack bascule seule : pas de navigate, pas de setState.
   async function handleLogout() {
@@ -68,9 +73,10 @@ export default function CatalogScreen({ navigation }: Props) {
     content = (
       <>
         <PrimaryButton label="+ Ajouter" onPress={() => navigation.navigate('EquipmentForm', {})} />
+        <SearchBar value={query} onChangeText={setQuery} />
         <FlatList
           style={styles.list}
-          data={equipments}
+          data={visibleEquipments}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
           ItemSeparatorComponent={ItemSeparator}
@@ -78,6 +84,8 @@ export default function CatalogScreen({ navigation }: Props) {
             <EmptyState message="Aucun équipement ne correspond à votre recherche." />
           }
           contentContainerStyle={styles.listContent}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
         />
       </>
     );
