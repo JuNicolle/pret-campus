@@ -21,6 +21,16 @@ export const EMPTY_EQUIPMENT_FORM: EquipmentFormValues = {
   condition: 'Bon état',
 };
 
+// Valeurs initiales du formulaire à partir d'un équipement existant.
+export function equipmentToFormValues(eq: Equipment): EquipmentFormValues {
+  return {
+    name: eq.name,
+    category: eq.category,
+    description: eq.description ?? '',
+    condition: eq.condition,
+  };
+}
+
 export type EquipmentFormResult =
   | { ok: true; input: Omit<Equipment, 'id' | 'createdAt'> }
   | { ok: false; errors: EquipmentFormErrors };

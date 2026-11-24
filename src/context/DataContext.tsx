@@ -125,7 +125,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
           return rule;
         }
       }
-      const updated: Equipment = { ...current, ...input, id: current.id, createdAt: current.createdAt };
+      // Les champs éditables sont remplacés : une description effacée (clé absente) est retirée
+      const { description: _previous, ...base } = current;
+      const updated: Equipment = { ...base, ...input, id: current.id, createdAt: current.createdAt };
       return commit(equipmentsRef.current.map((e) => (e.id === id ? updated : e)));
     });
   }, []);
