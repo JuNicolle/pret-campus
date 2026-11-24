@@ -83,6 +83,11 @@ describe('canLend', () => {
     expect(result).toEqual({ ok: false, message: ALREADY_LENT });
   });
 
+  it('should report already lent before a past date', () => {
+    const result = canLend(eq, [makeLoan({ equipmentId: eq.id })], '2020-01-01', '2026-11-24');
+    expect(result).toEqual({ ok: false, message: ALREADY_LENT });
+  });
+
   it('should report out of service before a past date', () => {
     const result = canLend(makeEquipment({ condition: 'Hors service' }), [], '2020-01-01', '2026-11-24');
     expect(result).toEqual({ ok: false, message: OUT_OF_SERVICE });

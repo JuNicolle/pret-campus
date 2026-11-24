@@ -62,9 +62,11 @@ describe('filterEquipments', () => {
 
   it('should return a new array and leave the inputs unchanged', () => {
     const input = [screen, headset];
-    const result = filterEquipments(input, loans, base);
+    const inputSnapshot = structuredClone(input);
+    const loansSnapshot = structuredClone(loans);
+    const result = filterEquipments(input, loans, { ...base, onlyAvailable: true });
     expect(result).not.toBe(input);
-    expect(input).toEqual([screen, headset]);
-    expect(loans).toHaveLength(1);
+    expect(input).toEqual(inputSnapshot);
+    expect(loans).toEqual(loansSnapshot);
   });
 });
