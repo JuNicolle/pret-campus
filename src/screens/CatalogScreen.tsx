@@ -1,6 +1,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
+import { AvailabilityToggle } from '../components/AvailabilityToggle';
 import { CatalogHeader } from '../components/CatalogHeader';
 import { EmptyState } from '../components/EmptyState';
 import { EquipmentCard } from '../components/EquipmentCard';
@@ -26,10 +27,11 @@ export default function CatalogScreen({ navigation }: Props) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [logoutError, setLogoutError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
+  const [onlyAvailable, setOnlyAvailable] = useState(false);
   // Garde synchrone : l'état `disabled` n'agit qu'après le re-rendu.
   const logoutInProgress = useRef(false);
 
-  const visibleEquipments = filterEquipments(equipments, loans, { query, onlyAvailable: false });
+  const visibleEquipments = filterEquipments(equipments, loans, { query, onlyAvailable });
 
   // En cas de succès, la stack bascule seule : pas de navigate, pas de setState.
   async function handleLogout() {
@@ -74,6 +76,7 @@ export default function CatalogScreen({ navigation }: Props) {
       <>
         <PrimaryButton label="+ Ajouter" onPress={() => navigation.navigate('EquipmentForm', {})} />
         <SearchBar value={query} onChangeText={setQuery} />
+        <AvailabilityToggle value={onlyAvailable} onValueChange={setOnlyAvailable} />
         <FlatList
           style={styles.list}
           data={visibleEquipments}
