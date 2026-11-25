@@ -23,7 +23,7 @@ npm test                 # tests unitaires (Jest)
 npm run test:coverage    # couverture, seuil global de 80 %
 ```
 
-Il n'y a ni serveur, ni compte, ni mot de passe : tout est stocké sur l'appareil.
+Il n'y a ni serveur, ni mot de passe : tout est stocké sur l'appareil.
 
 ## Fonctionnalités réalisées
 
@@ -45,9 +45,9 @@ Non réalisée : la photo d'un équipement.
 
 ## Limites
 
-- Testé avec Expo Go sur iOS uniquement ; Android n'a pas été testé.
+- Recette jouée par l'auteur avec Expo Go sur iOS uniquement ; Android n'a pas été testé.
 - Un prêt en retard n'est signalé que sur la fiche de l'équipement, pas dans le catalogue.
-- La fiche de tests `docs/TESTS.md` contient des étapes d'écran encore à confirmer ; seules les règles de gestion sont vérifiées par script et par tests automatisés.
+- La fiche de tests `docs/TESTS.md` contient des étapes d'écran encore à confirmer ; la logique (règles de gestion, recherche, validation, données de démonstration) est vérifiée par des scripts et des tests automatisés.
 - Les tests automatisés couvrent la logique (fonctions pures), pas l'interface : aucune bibliothèque de test d'interface n'est utilisée.
 - Écarts connus entre le comportement attendu et le comportement observé : voir la section « Écarts constatés » de `docs/TESTS.md`.
 - La recherche porte sur le nom de l'équipement uniquement.
@@ -79,24 +79,24 @@ Un ticket contient : le contexte, le repo concerné, une **taille** (S, M ou L),
 
 ### Jira pour savoir où on en est
 
-Jira n'était pas demandé par le sujet. Il sert de tableau de bord : quatre statuts, un ticket par PR.
+Jira n'était pas demandé par le sujet. Il sert de tableau de bord : quatre statuts, en général une PR par ticket.
 
 | Statut | Signification | Qui le fait bouger |
 |---|---|---|
 | À faire | Le ticket existe, rien n'est commencé | création après accord de l'auteur |
 | En cours | Un agent travaille dessus | Claude, au démarrage du travail |
 | To review | La PR est ouverte, **son lien est mis en commentaire du ticket** | Claude, à l'ouverture de la PR |
-| Merged | La PR est fusionnée | après le merge de l'auteur, jamais avant |
+| Merged | La PR est fusionnée | Claude, après le merge de l'auteur |
 
 Un ticket « Merged » est donc livré ; un ticket « To review » attend la relecture de l'auteur ; un ticket « En cours » est en chantier. Le lien de PR dans chaque ticket permet de retrouver le code, les commentaires et les tests.
 
 ### Le développement : la commande `/feature`
 
-Chaque lot de tickets suit quatre phases, avec un arrêt et une validation de l'auteur entre les étapes :
+Chaque lot de tickets suit ces phases, avec un arrêt et une validation de l'auteur entre les étapes :
 - **Phase 0 : ticket.** Lecture du ticket, questions si le besoin est ambigu, contrôle des dépendances (ticket et PR précédents mergés) et des fichiers en conflit.
 - **Phase 1 : cadrage.** `spec.md` (le besoin, les critères, le hors périmètre) et `plan.md` (architecture, décisions, risques, écrit par `tech-lead`). L'auteur valide.
 - **Phase 2 : tâches.** `tasks.md` : une tâche par ticket avec son agent, ses fichiers exclusifs, son livrable et sa commande de vérification. Deux tâches parallèles ne touchent jamais le même fichier. L'auteur valide.
-- **Phase 3 : réalisation.** Chaque agent travaille dans son **worktree Git isolé**, sur une branche issue de `main` ; les tâches indépendantes tournent en parallèle. Le code est suivi de tests, puis d'une **vérification indépendante** par une autre instance, qui introduit volontairement des défauts (mutations) : chaque défaut doit faire échouer un test. Une revue de code est faite **en local** (rapport remis à l'auteur, rien posté).
+- **Phase 3 : réalisation.** Chaque agent travaille dans son **worktree Git isolé**, sur une branche issue de `main` ; les tâches indépendantes tournent en parallèle. Le code est suivi de tests. Sur plusieurs lots, une **vérification indépendante** par une autre instance introduit volontairement des défauts (mutations) : chaque défaut doit faire échouer un test. Une revue de code est faite **en local** (rapport remis à l'auteur, rien posté).
 
 En fin de lot, chaque agent rapporte ses « Difficultés » : le **retour d'expérience** sert à corriger les consignes des agents.
 Les fichiers `spec.md`, `plan.md` et `tasks.md` de chaque lot sont conservés par l'auteur ; la preuve publique reste le code, les PR et Jira.
@@ -108,7 +108,6 @@ Les fichiers `spec.md`, `plan.md` et `tasks.md` de chaque lot sont conservés pa
 | `tech-lead` | Cadrage et plan technique de chaque lot |
 | `react-native-expo-expert` | Initialisation Expo, navigation, stockage, contextes, règles de gestion |
 | `react-native-component-architect` | Écrans, composants, formulaires, optionnelles |
-| `ui-designer` | Passe de lisibilité mobile |
 | `quality-analyst` | Tests Jest, fiche de tests, vérification indépendante par mutations |
 | `bug-analyst` | Vérification croisée des scénarios de démonstration |
 | `code-reviewer` | Revue de code locale |
