@@ -30,8 +30,10 @@ function Tile({ label, value, colors }: TileProps) {
 
 export function DashboardCounters({ counts }: DashboardCountersProps) {
   const summary =
-    `Parc : ${counts.total} équipements. Disponibles : ${counts.available}, ` +
-    `Prêtés : ${counts.lent}, Hors service : ${counts.outOfService}`;
+    `Parc : ${counts.total} ${counts.total === 1 ? 'équipement' : 'équipements'}. ` +
+    `${counts.available} ${counts.available === 1 ? 'disponible' : 'disponibles'}, ` +
+    `${counts.lent} ${counts.lent === 1 ? 'prêté' : 'prêtés'}, ` +
+    `${counts.outOfService} hors service`;
 
   return (
     <View accessible accessibilityRole="summary" accessibilityLabel={summary} style={styles.container}>
