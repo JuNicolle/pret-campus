@@ -26,7 +26,6 @@ export function getDashboardCounts(equipments: Equipment[], loans: Loan[]): Dash
         counts.outOfService += 1;
         break;
       // Exhaustivité vérifiée à la compilation ; branche inatteignable à l'exécution.
-      /* istanbul ignore next */
       default: {
         const unreachable: never = availability;
         return unreachable;
