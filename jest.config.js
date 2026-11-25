@@ -5,6 +5,7 @@ module.exports = {
   // Fonctions pures uniquement
   collectCoverageFrom: [
     'src/services/loanRules.ts',
+    'src/services/overdue.ts',
     'src/services/validation.ts',
     'src/services/loanWrites.ts',
     'src/services/equipmentWrites.ts',
