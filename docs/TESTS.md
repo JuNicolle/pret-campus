@@ -4,7 +4,7 @@ Cette fiche rassemble les sept scénarios de démonstration et les trois cas com
 
 ## Version vérifiée
 
-Les scripts de vérification (PC-42 et PC-43) ont été rejoués sur `main` au commit `30f0ba2`. Le code applicatif de `main` (HEAD `34430a6` à la rédaction) est identique : `git diff 30f0ba2 HEAD -- src App.tsx package.json` ne renvoie aucune différence. Seuls les fichiers `docs/tests/*.md` ont été ajoutés depuis.
+Les scripts de vérification (PC-42 et PC-43) ont été rejoués sur `main` au commit `30f0ba2`. Depuis, `main` (HEAD `151a9a3` à la rédaction) a reçu les trois optionnelles (tableau de bord, retard sur la fiche, historique des prêts) et des tests unitaires. `git diff 30f0ba2 HEAD -- src App.tsx package.json` ne montre aucune modification des règles de gestion, du stockage, des contextes ni des données de démonstration que les scripts exercent ; il montre des fichiers ajoutés et trois fichiers d'écran modifiés (`LoanInfo.tsx`, `CatalogScreen.tsx`, `EquipmentDetailScreen.tsx`). Les scripts n'ont pas été rejoués sur ce commit et cette fiche ne contient aucun scénario pour les optionnelles. Les lignes d'écran, toutes à ⏳, restent à jouer par l'auteur sur l'application actuelle.
 
 ## Environnement d'exécution des étapes d'écran
 
