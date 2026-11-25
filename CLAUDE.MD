@@ -55,23 +55,41 @@ src/
 │   ├── CatalogScreen.tsx         # Liste + recherche + filtre "disponibles"
 │   ├── EquipmentDetailScreen.tsx # Fiche + prêt en cours + actions
 │   ├── EquipmentFormScreen.tsx   # Ajout / modification
-│   └── LoanFormScreen.tsx        # Enregistrement d'un prêt
+│   ├── LoanFormScreen.tsx        # Enregistrement d'un prêt
+│   └── useReturnLoan.ts          # Hook : état et garde du retour d'un prêt
 ├── components/     # Composants réutilisables (EquipmentCard, StatusBadge, FormField, EmptyState, PrimaryButton…)
-├── navigation/     # AppNavigator.tsx (stack Auth vs stack App selon l'utilisateur connecté)
+├── navigation/     # Stack Auth vs stack App selon l'utilisateur connecté
+│   ├── AppNavigator.tsx
+│   └── types.ts    # Routes de chaque stack (paramètres : identifiants uniquement)
 ├── context/        # AuthContext, DataContext
+│   ├── AuthContext.tsx
+│   ├── DataContext.tsx
+│   └── useLoanActions.ts   # Actions de prêt et de retour du DataContext
 ├── storage/        # SEUL endroit qui touche AsyncStorage
 │   ├── keys.ts
 │   ├── userStorage.ts
 │   ├── equipmentStorage.ts
-│   └── loanStorage.ts
+│   ├── loanStorage.ts
+│   ├── listStorage.ts      # Lecture / écriture d'une liste JSON
+│   ├── seedStorage.ts      # Drapeau « données de démo insérées »
+│   ├── storageResult.ts    # Types de retour et message d'erreur communs
+│   └── initialData.ts      # Chargement initial et seed unique
 ├── services/       # Règles de gestion pures (testables, sans UI ni stockage)
 │   ├── loanRules.ts
 │   ├── validation.ts
+│   ├── loanForm.ts         # Validation du formulaire de prêt
+│   ├── loanWrites.ts       # Listes de prêts après un prêt ou un retour
+│   ├── equipmentForm.ts    # Valeurs et validation du formulaire d'équipement
+│   ├── equipmentWrites.ts  # Listes d'équipements après modification ou suppression
 │   └── __tests__/  # Tests unitaires, à côté du code testé
-├── data/seed.ts    # ≥ 6 équipements de démo, ≥ 3 catégories
+├── data/
+│   ├── seed.ts             # ≥ 6 équipements de démo, ≥ 3 catégories
+│   └── equipmentOptions.ts # Catégories et états proposés au formulaire
 ├── types/index.ts
 ├── utils/
 │   ├── date.ts     # today(), isBefore(), formatFr()
+│   ├── dateInput.ts # toIsoDate(), fromIsoDate() : Date <-> YYYY-MM-DD en heure locale
+│   ├── search.ts   # filterEquipments() : recherche par nom, filtre « disponibles »
 │   └── __tests__/  # Tests unitaires de utils/
 └── __tests__/fixtures.ts  # Fabriques de données de test partagées
 ```
@@ -238,7 +256,7 @@ Les règles pures du §5 sont couvertes par des tests automatisés (messages exa
 - **Statuts** : `À faire` → `En cours` → `To review` → `Merged`. Identifiants de transition : `11` À faire, `21` En cours, `31` To review, `41` Merged.
 - **Tickets** : PC-1 à PC-10 sont les epics, PC-11 à PC-57 les tickets de travail. Le détail (critères d'acceptation, agent suggéré, dépendances) est dans chaque ticket.
 - Branches : `feature/PC-<n>-<description>` ou `fix/PC-<n>-<description>` (la clé du ticket dans le nom).
-- Début du travail sur un ticket : le passer en `In Progress`.
+- Début du travail sur un ticket : le passer en `En cours`.
 - **PR créée** : passer le ticket en `To review` **et** ajouter le lien de la PR dans le ticket (commentaire Jira). Ces deux actions sont obligatoires, à chaque PR.
 - **Aucun merge sans accord explicite de l'auteur.** Ni Claude ni les sous-agents ne mergent une PR, même approuvée ou sans conflit. Le passage en `Merged` n'a lieu qu'après le merge, décidé par l'auteur.
 - À rappeler dans le prompt de chaque sous-agent qui ouvre des PR.
