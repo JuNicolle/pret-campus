@@ -57,7 +57,7 @@ src/
 │   ├── EquipmentFormScreen.tsx   # Ajout / modification
 │   ├── LoanFormScreen.tsx        # Enregistrement d'un prêt
 │   └── useReturnLoan.ts          # Hook : état et garde du retour d'un prêt
-├── components/     # Composants réutilisables (EquipmentCard, StatusBadge, FormField, EmptyState, PrimaryButton…)
+├── components/     # Composants réutilisables (EquipmentCard, StatusBadge, FormField, EmptyState, PrimaryButton, DashboardCounters, LoanHistory…)
 ├── navigation/     # Stack Auth vs stack App selon l'utilisateur connecté
 │   ├── AppNavigator.tsx
 │   └── types.ts    # Routes de chaque stack (paramètres : identifiants uniquement)
@@ -81,6 +81,9 @@ src/
 │   ├── loanWrites.ts       # Listes de prêts après un prêt ou un retour
 │   ├── equipmentForm.ts    # Valeurs et validation du formulaire d'équipement
 │   ├── equipmentWrites.ts  # Listes d'équipements après modification ou suppression
+│   ├── overdue.ts          # Prêt en retard : isOverdue (optionnelle)
+│   ├── dashboard.ts        # Compteurs du tableau de bord : getDashboardCounts (optionnelle)
+│   ├── loanHistory.ts      # Historique des prêts d'un équipement : getLoanHistory (optionnelle)
 │   └── __tests__/  # Tests unitaires, à côté du code testé
 ├── data/
 │   ├── seed.ts             # ≥ 6 équipements de démo, ≥ 3 catégories
