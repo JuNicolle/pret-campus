@@ -4,6 +4,7 @@ import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 're
 import { EmptyState } from '../components/EmptyState';
 import { EquipmentSummary } from '../components/EquipmentSummary';
 import { LoanActions } from '../components/LoanActions';
+import { LoanHistory } from '../components/LoanHistory';
 import { LoanInfo } from '../components/LoanInfo';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ScreenContainer } from '../components/ScreenContainer';
@@ -122,6 +123,7 @@ export default function EquipmentDetailScreen({ navigation, route }: Props) {
             disabled={isDeleting}
           />
         </View>
+        <LoanHistory equipmentId={equipment.id} loans={loans} />
       </ScrollView>
     );
   }
