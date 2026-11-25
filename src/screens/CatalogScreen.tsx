@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
 import { AvailabilityToggle } from '../components/AvailabilityToggle';
 import { CatalogHeader } from '../components/CatalogHeader';
+import { DashboardCounters } from '../components/DashboardCounters';
 import { EmptyState } from '../components/EmptyState';
 import { EquipmentCard } from '../components/EquipmentCard';
 import { PrimaryButton } from '../components/PrimaryButton';
@@ -11,6 +12,7 @@ import { SearchBar } from '../components/SearchBar';
 import { useAuth } from '../context/AuthContext';
 import { useData } from '../context/DataContext';
 import type { AppStackParamList } from '../navigation/types';
+import { getDashboardCounts } from '../services/dashboard';
 import { getAvailability } from '../services/loanRules';
 import type { Equipment } from '../types';
 import { filterEquipments } from '../utils/search';
@@ -32,6 +34,7 @@ export default function CatalogScreen({ navigation }: Props) {
   const logoutInProgress = useRef(false);
 
   const visibleEquipments = filterEquipments(equipments, loans, { query, onlyAvailable });
+  const counts = getDashboardCounts(equipments, loans);
 
   // En cas de succès, la stack bascule seule : pas de navigate, pas de setState.
   async function handleLogout() {
@@ -74,6 +77,7 @@ export default function CatalogScreen({ navigation }: Props) {
   } else {
     content = (
       <>
+        <DashboardCounters counts={counts} />
         <PrimaryButton label="+ Ajouter" onPress={() => navigation.navigate('EquipmentForm', {})} />
         <SearchBar value={query} onChangeText={setQuery} />
         <AvailabilityToggle value={onlyAvailable} onValueChange={setOnlyAvailable} />

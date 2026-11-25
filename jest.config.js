@@ -12,6 +12,7 @@ module.exports = {
     'src/services/equipmentWrites.ts',
     'src/services/equipmentForm.ts',
     'src/services/loanForm.ts',
+    'src/services/dashboard.ts',
     'src/utils/date.ts',
     'src/utils/dateInput.ts',
     'src/utils/search.ts',
