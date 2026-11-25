@@ -59,7 +59,7 @@ Non réalisée : la photo d'un équipement.
 
 ## Notre façon de travailler : développement agentique
 
-Ce projet est réalisé par l'auteur avec **Claude Code** (Anthropic) et des agents spécialisés. La collaboration est assumée et visible dans l'historique Git et dans Jira.
+Ce projet est réalisé par l'auteur avec **Claude Code** (Anthropic) et des agents spécialisés. La collaboration est assumée et visible dans l'historique Git.
 Les commandes `/feature` et `/ticket` ci-dessous sont des commandes Claude Code définies dans le [dépôt d'orchestration de l'auteur](https://github.com/JuNicolle/RAIDE_sub-agents), un dépôt séparé qui n'est pas inclus ici.
 
 ### Qui fait quoi
@@ -95,7 +95,7 @@ Un ticket « Merged » est donc livré ; un ticket « To review » attend la rel
 Chaque lot de tickets suit ces phases, avec un arrêt et une validation de l'auteur entre les étapes :
 - **Phase 0 : ticket.** Lecture du ticket, questions si le besoin est ambigu, contrôle des dépendances (ticket et PR précédents mergés) et des fichiers en conflit.
 - **Phase 1 : cadrage.** `spec.md` (le besoin, les critères, le hors périmètre) et `plan.md` (architecture, décisions, risques, écrit par `tech-lead`). L'auteur valide.
-- **Phase 2 : tâches.** `tasks.md` : une tâche par ticket avec son agent, ses fichiers exclusifs, son livrable et sa commande de vérification. Deux tâches parallèles ne touchent jamais le même fichier. L'auteur valide.
+- **Phase 2 : tâches.** `tasks.md` : une tâche par ticket avec son agent, ses fichiers exclusifs, son livrable et sa commande de vérification. Les tâches parallèles sont conçues pour ne jamais toucher le même fichier. L'auteur valide.
 - **Phase 3 : réalisation.** Chaque agent travaille dans son **worktree Git isolé**, sur une branche issue de `main` ; les tâches indépendantes tournent en parallèle. Le code est suivi de tests. Sur plusieurs lots, une **vérification indépendante** par une autre instance introduit volontairement des défauts (mutations) : chaque défaut doit faire échouer un test. Une revue de code est faite **en local** (rapport remis à l'auteur, rien posté).
 
 En fin de lot, chaque agent rapporte ses « Difficultés » : le **retour d'expérience** sert à corriger les consignes des agents.
@@ -118,7 +118,7 @@ Les agents `react-native-expo-expert` et `react-native-component-architect` ont 
 
 - **Chaque PR de code est lue et validée par l'auteur.** Les PR de tests et de documentation ne passent pas par ce cycle de relecture détaillée.
 - Sur GitHub, l'auteur **laisse des commentaires** sur le code qu'il ne comprend pas ou avec lequel il n'est pas d'accord ; **l'IA répond directement dans le fil** (explication, ou correction poussée dans un nouveau commit). L'auteur peut aussi refuser une proposition et garder sa version.
-- Les **merges sont faits à la main par l'auteur**. Aucun agent ne fusionne, ne poste de revue ni d'approbation.
+- Les **merges sont faits à la main par l'auteur**. Aucun agent ne fusionne ni ne poste de revue ou d'approbation : l'IA se contente de répondre aux commentaires de l'auteur.
 
 ### Garde-fous et traçabilité
 
