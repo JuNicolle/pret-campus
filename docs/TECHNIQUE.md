@@ -15,4 +15,4 @@
 - Les données sont du JSON et un prêt référence son équipement par `equipmentId` : pas de relations complexes, la liaison se fait en mémoire.
 
 ## Tests et sécurité
-- Les règles de gestion pures sont testées par Jest ; la règle est vérifiée deux fois (double sécurité) : boutons désactivés dans l'interface, puis contrôle à l'enregistrement dans `loanWrites`.
+- Les règles de gestion pures sont testées par Jest ; chaque règle est vérifiée deux fois (double sécurité) : dans l'interface (bouton désactivé ou message d'erreur), puis à l'enregistrement dans `loanWrites` (prêts) et `equipmentWrites` (suppression, passage hors service).
