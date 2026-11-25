@@ -7,6 +7,7 @@ module.exports = {
     'src/services/loanRules.ts',
     'src/services/validation.ts',
     'src/services/loanWrites.ts',
+    'src/services/loanHistory.ts',
     'src/services/equipmentWrites.ts',
     'src/services/equipmentForm.ts',
     'src/services/loanForm.ts',
