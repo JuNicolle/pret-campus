@@ -11,7 +11,7 @@
 - Les dates sont des chaînes `YYYY-MM-DD` en heure locale, comparables directement et sans problème de fuseau horaire.
 
 ## Choix d'AsyncStorage
-- Simple et déjà intégré à Expo : stockage clé-valeur sans serveur ni configuration, adapté à un petit volume de données (deux listes d'équipements et de prêts).
+- Simple et déjà intégré à Expo : stockage clé-valeur sans serveur ni configuration, adapté à un petit volume de données (deux listes, équipements et prêts, et le profil de l'utilisateur).
 - Les données sont du JSON et un prêt référence son équipement par `equipmentId` : pas de relations complexes, la liaison se fait en mémoire.
 
 ## Tests et sécurité
